@@ -129,7 +129,9 @@ class JsonPrinter {
         if (value->isNumber()) {
             *out << to_string(((JsonNumber *)value)->number);
         } else if (value->isString()) {
-            *out << quote(((JsonString *)value)->_string);
+            string str = ((JsonString *)value)->_string;
+            quote(str);
+            *out << str;
         } else if (value->isNull()) {
             *out << "null";
         } else if (value->isBoolean()) {
@@ -154,7 +156,9 @@ class JsonPrinter {
             auto it = map->begin();
             *out << "{ ";
             while (it != map->end()) {
-                *out << quote(it->first) << ": ";
+                string str = it->first;
+                quote(str);
+                *out << str << ": ";
                 print(it->second, out);
                 it++;
             }
@@ -162,9 +166,27 @@ class JsonPrinter {
         }
     }
 
-    string quote(string str) {
-        // TODO: replace " with escaped version
-        return '"' + str + '"';
+    // https://stackoverflow.com/questions/1494399/how-do-i-search-find-and-replace-in-a-standard-string
+    void replaceAll(std::string& str,
+                const std::string& oldStr,
+                const std::string& newStr)
+    {
+        std::string::size_type pos = 0u;
+        while((pos = str.find(oldStr, pos)) != std::string::npos){
+            str.replace(pos, oldStr.length(), newStr);
+            pos += newStr.length();
+        }
+    }
+
+    void quote(string& str) {
+        replaceAll(str, "\"", "\\\"");
+        replaceAll(str, "\t", "\\t");
+        replaceAll(str, "\n", "\\n");
+        replaceAll(str, "\f", "\\f");
+        replaceAll(str, "\b", "\\b");
+        replaceAll(str, "\r", "\\r");
+        str.insert(0, "\"");
+        str.push_back('"');
     }
 };
 
@@ -427,12 +449,39 @@ class JsonParser {
                 break;
             case 'u':
                 cursor++;
-                // TODO: hex sequence
-                throw ParseException("Todo: hex sequence.");
+                {
+                    int h1 = parseHex();
+                    int h2 = parseHex();
+                    int h3 = parseHex();
+                    int h4 = parseHex();
+                    if (h1 != -1 && h2 != -1 && h3 != -1 && h4 != -1) {
+                        char chr1 = (h1 * 16) + h2;
+                        char chr2 = (h3 * 16) + h4;
+                        characters->push_back(chr1);
+                        characters->push_back(chr2);
+                    } else {
+                        throw ParseException("Expected 4 hexadecimal numbers for u escape sequence.");
+                    }
+                }
                 break;
             default:
                 throw ParseException("Invalid escape sequence.");
         }
+    }
+
+    int parseHex() {
+        char chr = toupper(input[cursor]);
+
+        if (chr >= 48 && chr <= 57) {        /* 0-9 */
+            cursor++;
+            return chr - 48;
+        } else if (chr >= 65 && chr <= 70) { /* A-F */
+            cursor++;
+            return 10 + (chr - 65);
+        } else {
+            return -1;
+        }
+
     }
 
     JsonNumber *parseNumber() {
@@ -538,6 +587,7 @@ int main() {
         "00",
         "0.",
         "\"abc\"",
+        "\"I really \\\"like\\\" her\"",
         "\"abc\tdef\"",
         "[1, 2, 3]",
         "[1, 2]",
@@ -550,7 +600,11 @@ int main() {
         "{}",
         "{ \"name\": \"Bob\" }",
         "{}",
-        "{ \"numbers\": [1, 2, 3, 4] }"
+        "{ \"numbers\": [1, 2, 3, 4] }",
+        "{ \"numb\ters\": [1, 2, 3, 4] }",
+        "\"\\u1234\"",
+        //"\\u1234",
+        "I really like her"
     };
     JsonPrinter printer;
 
