@@ -155,7 +155,13 @@ class JsonPrinter {
             std::map<string, JsonValue *> *map = ((JsonObject *)value)->object;
             auto it = map->begin();
             *out << "{ ";
+            bool first = true;
             while (it != map->end()) {
+                if (first) {
+                    first = false;
+                } else {
+                    *out << ", ";
+                }
                 string str = it->first;
                 quote(str);
                 *out << str << ": ";
@@ -599,6 +605,7 @@ int main() {
         "[true, false]",
         "{}",
         "{ \"name\": \"Bob\" }",
+        "{ \"name\": \"Bob\", \"age\": 17, \"friends\": [] }",
         "{}",
         "{ \"numbers\": [1, 2, 3, 4] }",
         "{ \"numb\ters\": [1, 2, 3, 4] }",
