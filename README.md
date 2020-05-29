@@ -7,7 +7,6 @@ files.
 
 ## Todo
 
-* fix segfaults
 * implement hex escape sequences to make it work with multi-byte characters
 * separate the code into multiple files and organize in the C++ convensions
 * pretty printer

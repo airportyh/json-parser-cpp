@@ -610,7 +610,7 @@ int main() {
         "{ \"numbers\": [1, 2, 3, 4] }",
         "{ \"numb\ters\": [1, 2, 3, 4] }",
         "\"\\u1234\"",
-        //"\\u1234",
+        "\\u1234",
         "I really like her"
     };
     JsonPrinter printer;
@@ -621,8 +621,12 @@ int main() {
         cout << input << " = ";
         try {
             auto result = parser.parse();
-            printer.print(result, &cout);
-            cout << ", " << parser.cursor << endl;
+            if (result) {
+                printer.print(result, &cout);
+                cout << ", " << parser.cursor << endl;
+            } else {
+                cout << "no parse found" << endl;
+            }
         } catch (exception& e) {
             cout << "Error: " << e.what() << endl;
         }
