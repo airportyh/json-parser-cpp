@@ -17,3 +17,6 @@ files.
 ## Resources
 
 * https://stackoverflow.com/questions/8788057/how-to-initialize-and-print-a-stdwstring
+* https://en.wikipedia.org/wiki/Bitwise_operation
+* ["Characters, Symbols and the Unicode Miracle - Computerphile"](https://www.youtube.com/watch?v=MijmeoH9LT4)
+                        
