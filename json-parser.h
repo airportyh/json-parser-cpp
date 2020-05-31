@@ -1,115 +1,5 @@
-#include <iostream>
-#include <map>
-#include <vector>
 #include <string>
-#include <exception>
-
 using namespace std;
-
-class JsonValue {
-    public:
-    virtual bool isObject() = 0;
-    virtual bool isString() = 0;
-    virtual bool isArray() = 0;
-    virtual bool isNumber() = 0;
-    virtual bool isBoolean() = 0;
-    virtual bool isNull() = 0;
-    virtual string repr() = 0;
-};
-
-class JsonObject : public JsonValue {
-    public:
-    std::map<string, JsonValue *> *object;
-
-    JsonObject(std::map<string, JsonValue *> *obj): object(obj) {}
-
-    bool isObject() { return true; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return "<object>"; }
-};
-
-class JsonString : public JsonValue {
-    public:
-    string _string;
-
-    JsonString(string str): _string(str) {}
-
-    bool isObject() { return false; }
-    bool isString() { return true; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return "\"" + _string + "\""; }
-};
-
-class JsonArray : public JsonValue {
-    public:
-    vector<JsonValue *> *array;
-
-    JsonArray(vector<JsonValue *> *arr): array(arr) {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return true; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return "<array(" + to_string(array->size()) + ")>"; }
-};
-
-class JsonNumber : public JsonValue {
-    public:
-    double number;
-
-    JsonNumber(double _number): number(_number) {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return true; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return to_string(number); }
-};
-
-class JsonBoolean : public JsonValue {
-    public:
-    double boolean;
-
-    JsonBoolean(bool _bool): boolean(_bool) {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return true; }
-    bool isNull() { return false; }
-    string repr() {
-        if (boolean) {
-            return "true";
-        } else {
-            return "false";
-        }
-    }
-};
-
-class JsonNull : public JsonValue {
-    public:
-    JsonNull() {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return true; }
-    string repr() { return "null"; }
-};
 
 class ParseException : public exception {
     public:
@@ -123,78 +13,6 @@ class ParseException : public exception {
     }
 };
 
-class JsonPrinter {
-    public:
-    void print(JsonValue *value, ostream *out) {
-        if (value->isNumber()) {
-            *out << to_string(((JsonNumber *)value)->number);
-        } else if (value->isString()) {
-            string str = ((JsonString *)value)->_string;
-            quote(str);
-            *out << str;
-        } else if (value->isNull()) {
-            *out << "null";
-        } else if (value->isBoolean()) {
-            if (((JsonBoolean *)value)->boolean) {
-                *out << "true";
-            } else {
-                *out << "false";
-            }
-        } else if (value->isArray()) {
-            *out << "[ ";
-            vector<JsonValue *> *array = ((JsonArray *)value)->array;
-            for (int i = 0; i < array->size(); i++) {
-                JsonValue *value = (*array)[i];
-                if (i > 0) {
-                    *out << ", ";
-                }
-                print(value, out);
-            }
-            *out << " ]";
-        } else if (value->isObject()) {
-            std::map<string, JsonValue *> *map = ((JsonObject *)value)->object;
-            auto it = map->begin();
-            *out << "{ ";
-            bool first = true;
-            while (it != map->end()) {
-                if (first) {
-                    first = false;
-                } else {
-                    *out << ", ";
-                }
-                string str = it->first;
-                quote(str);
-                *out << str << ": ";
-                print(it->second, out);
-                it++;
-            }
-            *out << " }";
-        }
-    }
-
-    // https://stackoverflow.com/questions/1494399/how-do-i-search-find-and-replace-in-a-standard-string
-    void replaceAll(std::string& str,
-                const std::string& oldStr,
-                const std::string& newStr)
-    {
-        std::string::size_type pos = 0u;
-        while((pos = str.find(oldStr, pos)) != std::string::npos){
-            str.replace(pos, oldStr.length(), newStr);
-            pos += newStr.length();
-        }
-    }
-
-    void quote(string& str) {
-        replaceAll(str, "\"", "\\\"");
-        replaceAll(str, "\t", "\\t");
-        replaceAll(str, "\n", "\\n");
-        replaceAll(str, "\f", "\\f");
-        replaceAll(str, "\b", "\\b");
-        replaceAll(str, "\r", "\\r");
-        str.insert(0, "\"");
-        str.push_back('"');
-    }
-};
 
 class JsonParser {
     public:
@@ -461,10 +279,14 @@ class JsonParser {
                     int h3 = parseHex();
                     int h4 = parseHex();
                     if (h1 != -1 && h2 != -1 && h3 != -1 && h4 != -1) {
-                        char chr1 = (h1 * 16) + h2;
-                        char chr2 = (h3 * 16) + h4;
-                        characters->push_back(chr1);
-                        characters->push_back(chr2);
+                        // UTF-8 unicode conversion, based on
+                        // "Characters, Symbols and the Unicode Miracle - Computerphile"
+                        // https://www.youtube.com/watch?v=MijmeoH9LT4
+                        int code = ((((h1 * 16) + h2) * 16) + h3) * 16 + h4;
+                        int part1 = 0b11000000 + ((0b11111000000 & code) >> 6);
+                        int part2 = 0b10000000 +  (0b00000111111 & code);
+                        characters->push_back(part1);
+                        characters->push_back(part2);
                     } else {
                         throw ParseException("Expected 4 hexadecimal numbers for u escape sequence.");
                     }
@@ -579,58 +401,3 @@ class JsonParser {
         }
     }
 };
-
-int main() {
-    vector<string> testCases {
-        "12.56", 
-        "-67", 
-        "12.45e2", 
-        "12.45e-2", 
-        "12.45e+2", 
-        "-1", 
-        "0", 
-        "-0", 
-        "00",
-        "0.",
-        "\"abc\"",
-        "\"I really \\\"like\\\" her\"",
-        "\"abc\tdef\"",
-        "[1, 2, 3]",
-        "[1, 2]",
-        "[1]",
-        "[\"abc\", \"def\"]",
-        "[]",
-        "[[[[5]]], []]",
-        "true",
-        "[true, false]",
-        "{}",
-        "{ \"name\": \"Bob\" }",
-        "{ \"name\": \"Bob\", \"age\": 17, \"friends\": [] }",
-        "{}",
-        "{ \"numbers\": [1, 2, 3, 4] }",
-        "{ \"numb\ters\": [1, 2, 3, 4] }",
-        "\"\\u1234\"",
-        "\\u1234",
-        "I really like her"
-    };
-    JsonPrinter printer;
-
-    for (int i = 0; i < testCases.size(); i++) {
-        string input = testCases[i];
-        JsonParser parser(input);
-        cout << input << " = ";
-        try {
-            auto result = parser.parse();
-            if (result) {
-                printer.print(result, &cout);
-                cout << ", " << parser.cursor << endl;
-            } else {
-                cout << "no parse found" << endl;
-            }
-        } catch (exception& e) {
-            cout << "Error: " << e.what() << endl;
-        }
-    }
-    
-    
-}

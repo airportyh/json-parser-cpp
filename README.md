@@ -8,8 +8,12 @@ files.
 ## Todo
 
 * implement hex escape sequences to make it work with multi-byte characters
-* separate the code into multiple files and organize in the C++ convensions
 * pretty printer
 * add transform language
     * parser
     * intepreter
+* organize code in c++ convensions
+
+## Resources
+
+* https://stackoverflow.com/questions/8788057/how-to-initialize-and-print-a-stdwstring
