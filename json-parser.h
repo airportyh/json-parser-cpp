@@ -283,8 +283,8 @@ class JsonParser {
                         // "Characters, Symbols and the Unicode Miracle - Computerphile"
                         // https://www.youtube.com/watch?v=MijmeoH9LT4
                         int code = ((((h1 * 16) + h2) * 16) + h3) * 16 + h4;
-                        int byte1 = 0b11000000 + ((0b11111000000 & code) >> 6);
-                        int byte2 = 0b10000000 +  (0b00000111111 & code);
+                        char byte1 = 0b11000000 + ((0b11111000000 & code) >> 6);
+                        char byte2 = 0b10000000 +  (0b00000111111 & code);
                         characters->push_back(byte1);
                         characters->push_back(byte2);
                     } else {
