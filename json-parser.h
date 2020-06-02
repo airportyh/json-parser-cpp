@@ -59,7 +59,7 @@ class JsonParser {
     JsonValue *parseNull() {
         if (input.substr(cursor, 4) == "null") {
             cursor += 4;
-            return new JsonNull();
+            return JsonValue::null();
         } else {
             return NULL;
         }
@@ -68,10 +68,10 @@ class JsonParser {
     JsonValue *parseBoolean() {
         if (input.substr(cursor, 4) == "true") {
             cursor += 4;
-            return new JsonBoolean(true);
+            return JsonValue::boolean(true);
         } else if (input.substr(cursor, 5) == "false") {
             cursor += 5;
-            return new JsonBoolean(false);
+            return JsonValue::boolean(false);
         } else {
             return NULL;
         }
@@ -85,7 +85,7 @@ class JsonParser {
             if (map) {
                 if (input[cursor] == '}') {
                     cursor++;
-                    return new JsonObject(map);
+                    return JsonValue::object(map);
                 } else {
                     throw ParseException("Expected closing bracket for an object.");
                 }
@@ -95,7 +95,7 @@ class JsonParser {
                 if (input[cursor] == '}') {
                     cursor++;
                     std::map<string, JsonValue *> *map = new std::map<string, JsonValue *>();
-                    return new JsonObject(map);
+                    return JsonValue::object(map);
                 } else {
                     throw ParseException("Expected closing bracket for an object.");
                 }
@@ -128,14 +128,14 @@ class JsonParser {
 
     bool parseMember(map<string, JsonValue *> *map) {
         parseWs();
-        JsonString *key = parseString();
+        JsonValue *key = parseString();
         if (key) {
             parseWs();
             if (input[cursor] == ':') {
                 cursor++;
                 JsonValue *element = parseElement();
                 if (element) {
-                    (*map)[key->_string] = element;
+                    (*map)[key->string()] = element;
                     delete key;
                     return true;
                 }
@@ -152,7 +152,7 @@ class JsonParser {
             if (elements) {
                 if (input[cursor] == ']') {
                     cursor++;
-                    return new JsonArray(elements);
+                    return JsonValue::array(elements);
                 } else {
                     throw ParseException("Expected closing bracket for an array.");
                 }
@@ -206,14 +206,14 @@ class JsonParser {
         }
     }
 
-    JsonString *parseString() {
+    JsonValue *parseString() {
         int cursorStart = cursor;
         if (input[cursor] == '"') {
             cursor++;
             string *str = parseCharacters();
             if (input[cursor] == '"') {
                 cursor++;
-                return new JsonString(*str);
+                return JsonValue::string(*str);
             } else {
                 throw ParseException("Expected closing quote for a string.");
             }
@@ -312,13 +312,13 @@ class JsonParser {
 
     }
 
-    JsonNumber *parseNumber() {
+    JsonValue *parseNumber() {
         int cursorStart = cursor;
         if (parseInteger()) {
             parseFraction();
             parseExponent();
             double number = stod(input.substr(cursorStart, cursor - cursorStart));
-            return new JsonNumber(number);
+            return JsonValue::number(number);
         } else {
             return NULL;
         }

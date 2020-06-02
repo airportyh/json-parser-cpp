@@ -10,10 +10,11 @@ files.
 * add transform language
     * parser
     * intepreter
+* use namespaces
 * organize code in c++ convensions
-* `./read-json-file.bin read-json-file.bin` segfaults
 * implement hex escape sequences to make it work with multi-byte characters (done)
 * pretty printer (done)
+* `./read-json-file.bin read-json-file.bin` segfaults (done)
 
 ## Resources
 

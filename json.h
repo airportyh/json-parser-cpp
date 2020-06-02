@@ -4,107 +4,84 @@
 
 using namespace std;
 
+enum JsonValueType { JsonString, JsonNumber, JsonArray, JsonObject, JsonBoolean, JsonNull };
+
+union JsonValueData {
+    std::map<std::string, class JsonValue *> *object;
+    string string;
+    vector<JsonValue *> *array;
+    double number;
+    bool boolean;
+
+    JsonValueData() {}
+    ~JsonValueData() {}
+};
+
 class JsonValue {
     public:
-    virtual bool isObject() = 0;
-    virtual bool isString() = 0;
-    virtual bool isArray() = 0;
-    virtual bool isNumber() = 0;
-    virtual bool isBoolean() = 0;
-    virtual bool isNull() = 0;
-    virtual string repr() = 0;
-};
+    JsonValueType type;
+    union JsonValueData data;
 
-class JsonObject : public JsonValue {
-    public:
-    std::map<string, JsonValue *> *object;
+    JsonValue() {}
 
-    JsonObject(std::map<string, JsonValue *> *obj): object(obj) {}
-
-    bool isObject() { return true; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return "<object>"; }
-};
-
-class JsonString : public JsonValue {
-    public:
-    string _string;
-
-    JsonString(string str): _string(str) {}
-
-    bool isObject() { return false; }
-    bool isString() { return true; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return "\"" + _string + "\""; }
-};
-
-class JsonArray : public JsonValue {
-    public:
-    vector<JsonValue *> *array;
-
-    JsonArray(vector<JsonValue *> *arr): array(arr) {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return true; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return "<array(" + to_string(array->size()) + ")>"; }
-};
-
-class JsonNumber : public JsonValue {
-    public:
-    double number;
-
-    JsonNumber(double _number): number(_number) {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return true; }
-    bool isBoolean() { return false; }
-    bool isNull() { return false; }
-    string repr() { return to_string(number); }
-};
-
-class JsonBoolean : public JsonValue {
-    public:
-    double boolean;
-
-    JsonBoolean(bool _bool): boolean(_bool) {}
-
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return true; }
-    bool isNull() { return false; }
-    string repr() {
-        if (boolean) {
-            return "true";
-        } else {
-            return "false";
-        }
+    static JsonValue *string(string string) {
+        JsonValue *result = new JsonValue();
+        result->type = JsonString;
+        result->data.string = string;
+        return result;
     }
-};
 
-class JsonNull : public JsonValue {
-    public:
-    JsonNull() {}
+    static JsonValue *number(double number) {
+        JsonValue *result = new JsonValue();
+        result->type = JsonNumber;
+        result->data.number = number;
+        return result;
+    }
 
-    bool isObject() { return false; }
-    bool isString() { return false; }
-    bool isArray() { return false; }
-    bool isNumber() { return false; }
-    bool isBoolean() { return false; }
-    bool isNull() { return true; }
-    string repr() { return "null"; }
+    static JsonValue *object(std::map<std::string, JsonValue *> *object) {
+        JsonValue *result = new JsonValue();
+        result->type = JsonObject;
+        result->data.object = object;
+        return result;
+    }
+
+    static JsonValue *array(vector<JsonValue *> *array) {
+        JsonValue *result = new JsonValue();
+        result->type = JsonArray;
+        result->data.array = array;
+        return result;
+    }
+
+    static JsonValue* boolean(bool boolean) {
+        JsonValue *result = new JsonValue();
+        result->type = JsonBoolean;
+        result->data.boolean = boolean;
+        return result;
+    }
+
+    static JsonValue* null() {
+        JsonValue *result = new JsonValue();
+        result->type = JsonNull;
+        return result;
+    }
+
+    std::string string() {
+        return data.string;
+    }
+
+    std::map<std::string, JsonValue *> *object() {
+        return data.object;
+    }
+
+    vector<JsonValue *> *array() {
+        return data.array;
+    }
+
+    double number() {
+        return data.number;
+    }
+
+    bool boolean() {
+        return data.boolean;
+    }
 };

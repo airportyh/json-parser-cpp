@@ -5,22 +5,23 @@ class JsonPrinter {
         if (initialIndent) {
             *out << indent;
         }
-        if (value->isNumber()) {
-            *out << to_string(((JsonNumber *)value)->number);
-        } else if (value->isString()) {
-            string str = ((JsonString *)value)->_string;
+        
+        if (value->type == JsonNumber) {
+            *out << to_string(value->number());
+        } else if (value->type == JsonString) {
+            string str = value->string();
             quote(str);
             *out << str;
-        } else if (value->isNull()) {
+        } else if (value->type == JsonNull) {
             *out << "null";
-        } else if (value->isBoolean()) {
-            if (((JsonBoolean *)value)->boolean) {
+        } else if (value->type == JsonBoolean) {
+            if (value->boolean()) {
                 *out << "true";
             } else {
                 *out << "false";
             }
-        } else if (value->isArray()) {
-            vector<JsonValue *> *array = ((JsonArray *)value)->array;
+        } else if (value->type == JsonArray) {
+            vector<JsonValue *> *array = value->array();
             if (array->size() == 0) {
                 *out << "[]";
                 return;
@@ -34,8 +35,8 @@ class JsonPrinter {
                 print(value, out, level + 1, true);
             }
             *out << "\n" << indent << "]";
-        } else if (value->isObject()) {
-            std::map<string, JsonValue *> *map = ((JsonObject *)value)->object;
+        } else if (value->type == JsonObject) {
+            std::map<string, JsonValue *> *map = value->object();
             auto it = map->begin();
             if (map->size() == 0) {
                 *out << "{}";

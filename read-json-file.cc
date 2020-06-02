@@ -21,6 +21,10 @@ int main(int argc, char *argv[]) {
                  std::istreambuf_iterator<char>());
     JsonParser parser(input);
     JsonValue *result = parser.parse();
-    JsonPrinter printer;
-    printer.print(result, &cout);
+    if (result != NULL) {
+        JsonPrinter printer;
+        printer.print(result, &cout);
+    } else {
+        cout << "Parse error. Invalid JSON file." << endl;
+    }
 }
