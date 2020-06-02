@@ -7,12 +7,13 @@ files.
 
 ## Todo
 
-* implement hex escape sequences to make it work with multi-byte characters
-* pretty printer
 * add transform language
     * parser
     * intepreter
 * organize code in c++ convensions
+* `./read-json-file.bin read-json-file.bin` segfaults
+* implement hex escape sequences to make it work with multi-byte characters (done)
+* pretty printer (done)
 
 ## Resources
 

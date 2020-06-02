@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Soccer Ball",
+        "price": 20.50,
+        "categories": ["Sports"]
+    },
+    {
+        "name": "Jump Rope",
+        "price": 14.99,
+        "categories": ["Sports", "Fitness"]
+    }
+]

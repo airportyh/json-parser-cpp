@@ -11,7 +11,7 @@ using namespace std;
 
 int main() {
     vector<string> testCases {
-        "12.56", 
+        /*"12.56", 
         "-67", 
         "12.45e2", 
         "12.45e-2", 
@@ -28,9 +28,9 @@ int main() {
         "[1, 2]",
         "[1]",
         "[\"abc\", \"def\"]",
-        "[]",
+        "[]",*/
         "[[[[5]]], []]",
-        "true",
+        /*"true",
         "[true, false]",
         "{}",
         "{ \"name\": \"Bob\" }",
@@ -42,7 +42,7 @@ int main() {
         "\\u1234",
         "I really like her",
         "\"3.66\\u03c0\"",
-        "\"我\""
+        "\"我\""*/
     };
     JsonPrinter printer;
 

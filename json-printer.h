@@ -1,6 +1,10 @@
 class JsonPrinter {
     public:
-    void print(JsonValue *value, ostream *out) {
+    void print(JsonValue *value, ostream *out, int level = 0, bool initialIndent = false) {
+        string indent (level, '\t');
+        if (initialIndent) {
+            *out << indent;
+        }
         if (value->isNumber()) {
             *out << to_string(((JsonNumber *)value)->number);
         } else if (value->isString()) {
@@ -16,34 +20,45 @@ class JsonPrinter {
                 *out << "false";
             }
         } else if (value->isArray()) {
-            *out << "[ ";
             vector<JsonValue *> *array = ((JsonArray *)value)->array;
+            if (array->size() == 0) {
+                *out << "[]";
+                return;
+            }
+            *out << "[\n";
             for (int i = 0; i < array->size(); i++) {
                 JsonValue *value = (*array)[i];
                 if (i > 0) {
-                    *out << ", ";
+                    *out << ",\n";
                 }
-                print(value, out);
+                print(value, out, level + 1, true);
             }
-            *out << " ]";
+            *out << "\n" << indent << "]";
         } else if (value->isObject()) {
             std::map<string, JsonValue *> *map = ((JsonObject *)value)->object;
             auto it = map->begin();
-            *out << "{ ";
+            if (map->size() == 0) {
+                *out << "{}";
+                return;
+            }
+            *out << "{\n";
             bool first = true;
             while (it != map->end()) {
                 if (first) {
                     first = false;
                 } else {
-                    *out << ", ";
+                    *out << ",\n";
                 }
                 string str = it->first;
                 quote(str);
-                *out << str << ": ";
-                print(it->second, out);
+                *out << indent << "\t" << str << ": ";
+                print(it->second, out, level + 1, false);
                 it++;
             }
-            *out << " }";
+            *out << "\n" << indent << "}";
+        }
+        if (level == 0) {
+            *out << "\n";
         }
     }
 
