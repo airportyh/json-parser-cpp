@@ -4,6 +4,15 @@
 
 using namespace std;
 
+class AstNode {
+    public:
+    unsigned char type;
+
+    AstNode() {}
+
+    AstNode (unsigned char t): type(t) {}
+};
+
 enum JsonValueType { JsonString, JsonNumber, JsonArray, JsonObject, JsonBoolean, JsonNull };
 
 union JsonValueData {
@@ -17,9 +26,8 @@ union JsonValueData {
     ~JsonValueData() {}
 };
 
-class JsonValue {
+class JsonValue : public AstNode {
     public:
-    JsonValueType type;
     union JsonValueData data;
 
     JsonValue() {}
@@ -83,5 +91,23 @@ class JsonValue {
 
     bool boolean() {
         return data.boolean;
+    }
+
+    bool isTruthy() {
+        if (type == JsonNumber) {
+            return number() != 0;
+        } else if (type == JsonString) {
+            return string().size() != 0;
+        } else if (type == JsonArray) {
+            return true;
+        } else if (type == JsonObject) {
+            return true;
+        } else if (type == JsonBoolean) {
+            return boolean();
+        } else if (type == JsonNull) {
+            return false;
+        } else {
+            throw "unknown type";
+        }
     }
 };

@@ -57,6 +57,7 @@ class JsonPrinter {
                 it++;
             }
             *out << "\n" << indent << "}";
+            
         }
         if (level == 0) {
             *out << "\n";

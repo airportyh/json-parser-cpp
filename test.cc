@@ -4,6 +4,7 @@
 #include <string>
 #include <exception>
 #include "json.h"
+#include "base-parser.h"
 #include "json-parser.h"
 #include "json-printer.h"
 
