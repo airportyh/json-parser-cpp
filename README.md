@@ -8,7 +8,7 @@ files.
 ## Todo
 
 * all the binary operators:
-    * + - * /
+    * `+` `-` `*` `/`
     * `>` `<` etc
 * use namespaces
 * organize code in c++ convensions
