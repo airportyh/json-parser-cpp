@@ -7,11 +7,14 @@ files.
 
 ## Todo
 
-* add transform language
-    * parser
-    * intepreter
+* all the binary operators:
+    * + - * /
+    * `>` `<` etc
 * use namespaces
 * organize code in c++ convensions
+* add transform language (done0)
+    * parser
+    * intepreter
 * implement hex escape sequences to make it work with multi-byte characters (done)
 * pretty printer (done)
 * `./read-json-file.bin read-json-file.bin` segfaults (done)
