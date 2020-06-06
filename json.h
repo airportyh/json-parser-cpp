@@ -110,4 +110,25 @@ class JsonValue : public AstNode {
             throw "unknown type";
         }
     }
+
+    bool equals(JsonValue *other) {
+        if (type != other->type) {
+            return false;
+        }
+        if (type == JsonNumber) {
+            return number() == other->number();
+        } else if (type == JsonString) {
+            return string() == other->string();
+        } else if (type == JsonArray) {
+            return array() == other->array();
+        } else if (type == JsonObject) {
+            return object() == other->object();
+        } else if (type == JsonBoolean) {
+            return boolean() == other->boolean();
+        } else if (type == JsonNull) {
+            return true;
+        } else {
+            throw "Blargh";
+        }
+    }
 };
