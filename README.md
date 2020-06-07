@@ -7,11 +7,14 @@ files.
 
 ## Todo
 
-* all the binary operators:
-    * `+` `-` `*` `/`
-    * `>` `<` etc
+* parenthesis for binary operators
+* conditional
+* operator precedence
 * use namespaces
 * organize code in c++ convensions
+* all the binary operators (done)
+    * `+` `-` `*` `/`
+    * `>` `<` etc
 * add transform language (done0)
     * parser
     * intepreter

@@ -44,6 +44,37 @@ class JsonTxPrinter {
     }
 
     void printBinaryOperator(JsonTxBinaryOperator op, ostream *out) {
-        *out << " == ";
+        switch (op) {
+            case JsonTxPlus:
+                *out << " + ";
+                break;
+            case JsonTxMinus:
+                *out << " - ";
+                break;
+            case JsonTxTimes:
+                *out << " * ";
+                break;
+            case JsonTxDivide:
+                *out << " / ";
+                break;
+            case JsonTxGreaterThan:
+                *out << " > ";
+                break;
+            case JsonTxLessThan:
+                *out << " < ";
+                break;
+            case JsonTxGreaterThanOrEqual:
+                *out << " >= ";
+                break;
+            case JsonTxLessThanOrEqual:
+                *out << " <= ";
+                break;
+            case JsonTxEqual:
+                *out << " == ";
+                break;
+            default:
+                *out << " (unknown operator) ";
+                break;
+        }
     }
 };

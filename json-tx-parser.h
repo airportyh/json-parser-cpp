@@ -286,7 +286,31 @@ class JsonTxParser: public BaseParser {
     }
 
     unsigned char parseOperator() {
-        if (input.substr(cursor, 2) == "==") {
+        if (input[cursor] == '+') {
+            cursor++;
+            return JsonTxPlus;
+        } else if (input[cursor] == '-') {
+            cursor++;
+            return JsonTxMinus;
+        } else if (input[cursor] == '*') {
+            cursor++;
+            return JsonTxTimes;
+        } else if (input[cursor] == '/') {
+            cursor++;
+            return JsonTxDivide;
+        } else if (input[cursor] == '>') {
+            cursor++;
+            return JsonTxGreaterThan;
+        } else if (input[cursor] == '<') {
+            cursor++;
+            return JsonTxLessThan;
+        } else if (input.substr(cursor, 2) == ">=") {
+            cursor += 2;
+            return JsonTxGreaterThanOrEqual;
+        } else if (input.substr(cursor, 2) == "<=") {
+            cursor += 2;
+            return JsonTxLessThanOrEqual;
+        } else if (input.substr(cursor, 2) == "==") {
             cursor += 2;
             return JsonTxEqual;
         } else {

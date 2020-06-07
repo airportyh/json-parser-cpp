@@ -33,10 +33,70 @@ class JsonTxEvaluator {
             JsonValue *left = evaluate(value, binOpExpr->left);
             JsonValue *right = evaluate(value, binOpExpr->right);
             switch (binOpExpr->op) {
+                case JsonTxPlus:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::number(left->number() + right->number());
+                    } else if (left->type == JsonString && right->type == JsonString) {
+                        return JsonValue::string(left->string() + right->string());
+                    } else {
+                        return JsonValue::null();
+                    }
+                case JsonTxMinus:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::number(left->number() - right->number());
+                    } else {
+                        return JsonValue::null();
+                    }
+                case JsonTxTimes:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::number(left->number() * right->number());
+                    } else {
+                        return JsonValue::null();
+                    }
+                case JsonTxDivide:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::number(left->number() / right->number());
+                    } else {
+                        return JsonValue::null();
+                    }
+                case JsonTxGreaterThan:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::boolean(left->number() > right->number());
+                    } else if (left->type == JsonString && right->type == JsonString) {
+                        return JsonValue::boolean(left->string() > right->string());
+                    } else {
+                        return JsonValue::null();
+                    }
+                case JsonTxLessThan:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::boolean(left->number() < right->number());
+                    } else if (left->type == JsonString && right->type == JsonString) {
+                        return JsonValue::boolean(left->string() < right->string());
+                    } else {
+                        return JsonValue::null();
+                    }
+                case JsonTxGreaterThanOrEqual:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::boolean(left->number() >= right->number());
+                    } else if (left->type == JsonString && right->type == JsonString) {
+                        return JsonValue::boolean(left->string() >= right->string());
+                    } else {
+                        return JsonValue::null();
+                    }
+                    break;
+                case JsonTxLessThanOrEqual:
+                    if (left->type == JsonNumber && right->type == JsonNumber) {
+                        return JsonValue::boolean(left->number() <= right->number());
+                    } else if (left->type == JsonString && right->type == JsonString) {
+                        return JsonValue::boolean(left->string() <= right->string());
+                    } else {
+                        return JsonValue::null();
+                    }
+                    break;
                 case JsonTxEqual:
                     return JsonValue::boolean(left->equals(right));
                 default:
-                throw "Unsupported binary operation";
+                    throw "Unsupported binary operation";
             }
         } else if (op->type == JsonString || op->type == JsonNumber || op->type == JsonBoolean || op->type == JsonNull) {
             JsonValue *opValue = static_cast<JsonValue *>(op);

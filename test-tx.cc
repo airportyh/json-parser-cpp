@@ -13,9 +13,9 @@ using namespace std;
 
 int main() {
     string json = 
-    "[ { \"name\": { \"first\": \"Marty\", \"last\": \"Ho\" } }, "
-      "{ \"name\": { \"first\": \"Linus\", \"last\": \"Ho\", \"middle\": \"Z\" } }, "
-      "{ \"name\": { \"first\": \"Emma\", \"last\": \"Ho\" }, \"oldest\": true } ]";
+    "[ { \"name\": { \"first\": \"Marty\", \"last\": \"Ho\" }, \"age\": 9 }, "
+      "{ \"name\": { \"first\": \"Linus\", \"last\": \"Ho\", \"middle\": \"Z\" }, \"age\": 7 }, "
+      "{ \"name\": { \"first\": \"Emma\", \"last\": \"Ho\" }, \"oldest\": true, \"age\": 12 } ]";
     std::vector<string> inputs = {
         "name", 
         "[0]", 
@@ -43,7 +43,9 @@ int main() {
         "filter(true)",
         "filter(false)",
         "filter(null)",
-        "filter(name.first == \"Emma\")"
+        "filter(name.first == \"Emma\")",
+        "filter(age > 9)",
+        "filter(16 < age + 5)"
     };
     JsonParser parser (json);
     JsonValue *jsonValue = parser.parse();
